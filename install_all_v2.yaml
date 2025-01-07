@@ -1,0 +1,58 @@
+- hosts: locals
+  tasks:
+    # Sunchronize repositories and Update System
+    - name: Update pacman cache and System
+      become: yes
+      tags: update
+      pacman:
+        update_cache: true
+        upgrade: true
+
+    # Install JDK21 and Gradle
+    - name: Install OpenJDK21 and Gradle (latest)
+      become: yes
+      tags: jdk
+      pacman:
+        name: 
+          - jdk21-openjdk
+          - gradle
+        state: present
+
+    # Install Docker
+    - name: Install Docker and Compose
+      become: yes
+      tags: docker
+      pacman:
+        name: 
+          - docker
+          - docker-compose
+        state: present
+
+    # Запуск службы Docker
+    - name: Запуск службы Docker
+      become: yes
+      tags: docker
+      ansible.builtin.systemd:
+        name: docker.service
+        state: started
+
+    # Включение автозапуска службы Docker
+    - name: Включение автозапуска Docker
+      become: yes
+      tags: docker
+      ansible.builtin.systemd:
+        name: docker.service
+        enabled: yes
+
+    # Получение текущего пользователя
+    - name: Получение текущего пользователя
+      ansible.builtin.command: whoami
+      register: current_user
+
+    # Добавление текущего пользователя в группу docker
+    - name: Добавление пользователя в группу docker
+      become: yes
+      ansible.builtin.user:
+        name: "{{ current_user.stdout }}"
+        groups: docker
+        append: yes
