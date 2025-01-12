@@ -12,3 +12,6 @@ shtako2:
 
 install_all:
 	ansible-playbook install_all.yaml -i $(INVENTORY) --ask-become-pass
+
+install_local:
+	ansible-playbook install_local.yaml -i $(INVENTORY) --ask-become-pass
